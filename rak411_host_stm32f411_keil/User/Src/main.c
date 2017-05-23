@@ -190,19 +190,19 @@ static void Reset_config(void)
 //SYSCLK: system clk
 void delay_init(uint8_t SYSCLK)
 {
-#if SYSTEM_SUPPORT_OS 						//Èç¹ûÐèÒªÖ§³ÖOS.
+#if SYSTEM_SUPPORT_OS 						//å¦‚æžœéœ€è¦æ”¯æŒOS.
 	u32 reload;
 #endif
-  HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);//SysTickÆµÂÊÎªHCLK
-	fac_us=SYSCLK;						//²»ÂÛÊÇ·ñÊ¹ÓÃOS,fac_us¶¼ÐèÒªÊ¹ÓÃ
-#if SYSTEM_SUPPORT_OS 						//Èç¹ûÐèÒªÖ§³ÖOS.
-	reload=SYSCLK;					    //Ã¿ÃëÖÓµÄ¼ÆÊý´ÎÊý µ¥Î»ÎªK	   
-	reload*=1000000/delay_ostickspersec;	//¸ù¾Ýdelay_ostickspersecÉè¶¨Òç³öÊ±¼ä
-											//reloadÎª24Î»¼Ä´æÆ÷,×î´óÖµ:16777216,ÔÚ180MÏÂ,Ô¼ºÏ0.745s×óÓÒ	
-	fac_ms=1000/delay_ostickspersec;		//´ú±íOS¿ÉÒÔÑÓÊ±µÄ×îÉÙµ¥Î»	   
-	SysTick->CTRL|=SysTick_CTRL_TICKINT_Msk;//¿ªÆôSYSTICKÖÐ¶Ï
-	SysTick->LOAD=reload; 					//Ã¿1/OS_TICKS_PER_SECÃëÖÐ¶ÏÒ»´Î	
-	SysTick->CTRL|=SysTick_CTRL_ENABLE_Msk; //¿ªÆôSYSTICK
+  HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);//SysTické¢‘çŽ‡ä¸ºHCLK
+	fac_us=SYSCLK;						//ä¸è®ºæ˜¯å¦ä½¿ç”¨OS,fac_uséƒ½éœ€è¦ä½¿ç”¨
+#if SYSTEM_SUPPORT_OS 						//å¦‚æžœéœ€è¦æ”¯æŒOS.
+	reload=SYSCLK;					    //æ¯ç§’é’Ÿçš„è®¡æ•°æ¬¡æ•° å•ä½ä¸ºK	   
+	reload*=1000000/delay_ostickspersec;	//æ ¹æ®delay_ostickspersecè®¾å®šæº¢å‡ºæ—¶é—´
+											//reloadä¸º24ä½å¯„å­˜å™¨,æœ€å¤§å€¼:16777216,åœ¨180Mä¸‹,çº¦åˆ0.745så·¦å³	
+	fac_ms=1000/delay_ostickspersec;		//ä»£è¡¨OSå¯ä»¥å»¶æ—¶çš„æœ€å°‘å•ä½	   
+	SysTick->CTRL|=SysTick_CTRL_TICKINT_Msk;//å¼€å¯SYSTICKä¸­æ–­
+	SysTick->LOAD=reload; 					//æ¯1/OS_TICKS_PER_SECç§’ä¸­æ–­ä¸€æ¬¡	
+	SysTick->CTRL|=SysTick_CTRL_ENABLE_Msk; //å¼€å¯SYSTICK
 #else
 #endif
 }	
@@ -213,18 +213,18 @@ void delay_us(uint32_t nus)
 {							
   uint32_t ticks;
 	uint32_t told,tnow,tcnt=0;
-	uint32_t reload=SysTick->LOAD;				//LOADµÄÖµ	    	 
-	ticks=nus*fac_us; 						//ÐèÒªµÄ½ÚÅÄÊý 
-	told=SysTick->VAL;        				//¸Õ½øÈëÊ±µÄ¼ÆÊýÆ÷Öµ
+	uint32_t reload=SysTick->LOAD;				//LOADçš„å€¼	    	 
+	ticks=nus*fac_us; 						//éœ€è¦çš„èŠ‚æ‹æ•° 
+	told=SysTick->VAL;        				//åˆšè¿›å…¥æ—¶çš„è®¡æ•°å™¨å€¼
 	while(1)
 	{
 		tnow=SysTick->VAL;	
 		if(tnow!=told)
 		{	    
-			if(tnow<told)tcnt+=told-tnow;	//ÕâÀï×¢ÒâÒ»ÏÂSYSTICKÊÇÒ»¸öµÝ¼õµÄ¼ÆÊýÆ÷¾Í¿ÉÒÔÁË.
+			if(tnow<told)tcnt+=told-tnow;	//è¿™é‡Œæ³¨æ„ä¸€ä¸‹SYSTICKæ˜¯ä¸€ä¸ªé€’å‡çš„è®¡æ•°å™¨å°±å¯ä»¥äº†.
 			else tcnt+=reload-tnow+told;	    
 			told=tnow;
-			if(tcnt>=ticks)break;			//Ê±¼ä³¬¹ý/µÈÓÚÒªÑÓ³ÙµÄÊ±¼ä,ÔòÍË³ö.
+			if(tcnt>=ticks)break;			//æ—¶é—´è¶…è¿‡/ç­‰äºŽè¦å»¶è¿Ÿçš„æ—¶é—´,åˆ™é€€å‡º.
 		}  
 	};	
 }
@@ -261,29 +261,24 @@ int main(void)
 	int socket_flag=-1	;
 	while (1)
 	{
-		 
-		 if (!(HAL_GPIO_ReadPin(SPIx_INT_GPIO_PORT,SPIx_INT_PIN)))
-	   {
-			if 	(rak_checkPktIrq()==RAK_TRUE)
+		if(Send_RecieveDataFlag==RAK_TRUE)
+		{			 
+			Send_RecieveDataFlag=RAK_FALSE;
+			rak_send_data(0,0,uCmdRspFrame.recvFrame.socket_flag, 
+			uCmdRspFrame.recvFrame.data_len,uCmdRspFrame.recvFrame.recvDataBuf);					
+		}
+		while(!(HAL_GPIO_ReadPin(SPIx_INT_GPIO_PORT,SPIx_INT_PIN)));
+		if(rak_checkPktIrq() == RAK_TRUE)
+	 	{
+		 	rak_read_packet(&uCmdRspFrame);
+		 	rak_clearPktIrq();
+			if(uCmdRspFrame.rspCode[0]==RSPCODE_RECV_DATA)
 			{
-				rak_read_packet(&uCmdRspFrame);
-				rak_clearPktIrq();
-				if (uCmdRspFrame.rspCode[0]==RSPCODE_SOCKET_SVR)
-				{
-				   	socket_flag = uCmdRspFrame.recvsocketEst.socket_flag ;
-				}
-				else if (uCmdRspFrame.rspCode[0]==RSPCODE_SOCKET_CLOSE)
-				{
-					 socket_flag=-1;
-				}
-      }
-	   }
-     if (socket_flag>=0)
-	   {
-		   rak_send_data(0,0,socket_flag,1400,(uint8_t *)tx_buffer);
-	   }
+			   Send_RecieveDataFlag=RAK_TRUE;			
+			}
+	 	} 
+	
 	}
-}
 
 
 
